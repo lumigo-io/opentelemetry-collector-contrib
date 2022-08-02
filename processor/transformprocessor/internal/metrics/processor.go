@@ -21,16 +21,16 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.uber.org/zap"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor/internal/common"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/telemetryquerylanguage/tql"
 )
 
 type Processor struct {
-	queries []common.Query
+	queries []tql.Query
 	logger  *zap.Logger
 }
 
 func NewProcessor(statements []string, functions map[string]interface{}, settings component.ProcessorCreateSettings) (*Processor, error) {
-	queries, err := common.ParseQueries(statements, functions, ParsePath)
+	queries, err := tql.ParseQueries(statements, functions, ParsePath, ParseEnum)
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +49,7 @@ func (p *Processor) ProcessMetrics(_ context.Context, td pmetric.Metrics) (pmetr
 			smetrics := rmetrics.ScopeMetrics().At(j)
 			ctx.il = smetrics.Scope()
 			metrics := smetrics.Metrics()
+			ctx.metrics = metrics
 			for k := 0; k < metrics.Len(); k++ {
 				ctx.metric = metrics.At(k)
 				switch ctx.metric.DataType() {

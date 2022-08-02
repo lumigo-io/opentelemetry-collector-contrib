@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// nolint:errcheck
 package signalfxreceiver
 
 import (
@@ -99,8 +98,7 @@ func Test_signalfxeceiver_New(t *testing.T) {
 }
 
 func Test_signalfxeceiver_EndToEnd(t *testing.T) {
-	port := testutil.GetAvailablePort(t)
-	addr := fmt.Sprintf("localhost:%d", port)
+	addr := testutil.GetAvailableLocalAddress(t)
 	cfg := createDefaultConfig().(*Config)
 	cfg.Endpoint = addr
 	sink := new(consumertest.MetricsSink)
@@ -108,8 +106,11 @@ func Test_signalfxeceiver_EndToEnd(t *testing.T) {
 	r.RegisterMetricsConsumer(sink)
 
 	require.NoError(t, r.Start(context.Background(), componenttest.NewNopHost()))
+	require.NoError(t, r.Start(context.Background(), componenttest.NewNopHost()))
 	runtime.Gosched()
-	defer r.Shutdown(context.Background())
+	defer func() {
+		require.NoError(t, r.Shutdown(context.Background()))
+	}()
 
 	unixSecs := int64(1574092046)
 	unixNSecs := int64(11 * time.Millisecond)
@@ -171,14 +172,16 @@ func Test_signalfxeceiver_EndToEnd(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, exp.Start(context.Background(), componenttest.NewNopHost()))
 	assert.Eventually(t, func() bool {
-		conn, err := net.Dial("tcp", fmt.Sprintf("localhost:%d", port))
+		conn, err := net.Dial("tcp", addr)
 		if err == nil && conn != nil {
 			conn.Close()
 			return true
 		}
 		return false
 	}, 10*time.Second, 5*time.Millisecond, "failed to wait for the port to be open")
-	defer exp.Shutdown(context.Background())
+	defer func() {
+		require.NoError(t, exp.Shutdown(context.Background()))
+	}()
 	require.NoError(t, exp.ConsumeMetrics(context.Background(), want))
 
 	mds := sink.AllMetrics()
@@ -551,7 +554,9 @@ func Test_sfxReceiver_TLS(t *testing.T) {
 	sink := new(consumertest.MetricsSink)
 	r := newReceiver(componenttest.NewNopReceiverCreateSettings(), *cfg)
 	r.RegisterMetricsConsumer(sink)
-	defer r.Shutdown(context.Background())
+	defer func() {
+		require.NoError(t, r.Shutdown(context.Background()))
+	}()
 
 	mh := newAssertNoErrorHost(t)
 	require.NoError(t, r.Start(context.Background(), mh), "should not have failed to start metric reception")

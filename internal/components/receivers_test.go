@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Skip tests on Windows temporarily, see https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/11451
+//go:build !windows
+// +build !windows
+
 package components
 
 import (
 	"context"
 	"errors"
-	"path"
+	"path/filepath"
 	"runtime"
 	"testing"
 
@@ -29,10 +33,10 @@ import (
 	"go.opentelemetry.io/collector/config"
 	"go.opentelemetry.io/collector/consumer/consumertest"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/common/testutil"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/adapter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/carbonreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/otlpjsonfilereceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/syslogreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/tcplogreceiver"
@@ -53,6 +57,9 @@ func TestDefaultReceivers(t *testing.T) {
 		{
 			receiver:     "active_directory_ds",
 			skipLifecyle: true, // Requires a running windows service
+		},
+		{
+			receiver: "aerospike",
 		},
 		{
 			receiver: "apache",
@@ -107,22 +114,32 @@ func TestDefaultReceivers(t *testing.T) {
 			receiver: "elasticsearch",
 		},
 		{
+			receiver: "expvar",
+		},
+		{
 			receiver: "filelog",
 			getConfigFn: func() config.Receiver {
 				cfg := rcvrFactories["filelog"].CreateDefaultConfig().(*filelogreceiver.FileLogConfig)
 				cfg.Input = adapter.InputConfig{
 					"include": []string{
-						path.Join(testutil.NewTemporaryDirectory(t), "*"),
+						filepath.Join(t.TempDir(), "*"),
 					},
 				}
 				return cfg
 			},
 		},
 		{
+			receiver: "flinkmetrics",
+		},
+		{
 			receiver: "fluentforward",
 		},
 		{
 			receiver: "googlecloudspanner",
+		},
+		{
+			receiver:     "googlecloudpubsub",
+			skipLifecyle: true, // Requires a pubsub subscription
 		},
 		{
 			receiver: "hostmetrics",
@@ -190,6 +207,14 @@ func TestDefaultReceivers(t *testing.T) {
 			receiver: "otlp",
 		},
 		{
+			receiver: "otlpjsonfile",
+			getConfigFn: func() config.Receiver {
+				cfg := rcvrFactories["otlpjsonfile"].CreateDefaultConfig().(*otlpjsonfilereceiver.Config)
+				cfg.Include = []string{"/tmp/*.log"}
+				return cfg
+			},
+		},
+		{
 			receiver:     "podman_stats",
 			skipLifecyle: true, // Requires a running podman daemon
 		},
@@ -241,6 +266,9 @@ func TestDefaultReceivers(t *testing.T) {
 		},
 		{
 			receiver: "splunk_hec",
+		},
+		{
+			receiver: "sqlquery",
 		},
 		{
 			receiver:     "sqlserver",
@@ -302,6 +330,10 @@ func TestDefaultReceivers(t *testing.T) {
 		},
 		{
 			receiver: "vcenter",
+		},
+		{
+			receiver:     "solace",
+			skipLifecyle: true, // Requires a solace broker to connect to
 		},
 	}
 

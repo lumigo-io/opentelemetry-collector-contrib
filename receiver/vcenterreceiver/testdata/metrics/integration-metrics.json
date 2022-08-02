@@ -266,6 +266,12 @@
                         "value": {
                             "stringValue": "LocalDS_0"
                         }
+                    },
+                    {
+                        "key": "vcenter.cluster.name",
+                        "value": {
+                            "stringValue": "DC0_C0"
+                        }
                     }
                 ]
             },
@@ -813,7 +819,7 @@
                                             {
                                                 "key": "effective",
                                                 "value": {
-                                                    "stringValue": "false"
+                                                    "boolValue": false
                                                 }
                                             }
                                         ],
@@ -826,7 +832,7 @@
                                             {
                                                 "key": "effective",
                                                 "value": {
-                                                    "stringValue": "true"
+                                                    "boolValue": true
                                                 }
                                             }
                                         ],

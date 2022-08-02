@@ -379,6 +379,76 @@ func TestCompareMetrics(t *testing.T) {
 			},
 		},
 		{
+			name: "ignore-one-resource-attribute",
+			compareOptions: []CompareOption{
+				IgnoreResourceAttributeValue("node_id"),
+			},
+			withoutOptions: expectation{
+				err: multierr.Combine(
+					errors.New("missing expected resource with attributes: map[node_id:a-different-random-id]"),
+					errors.New("extra resource with attributes: map[node_id:a-random-id]"),
+				),
+				reason: "An unpredictable resource attribute will cause failures if not ignored.",
+			},
+			withOptions: expectation{
+				err:    nil,
+				reason: "The unpredictable resource attribute was ignored on each resource that carried it.",
+			},
+		},
+		{
+			name: "ignore-one-resource-attribute-multiple-resources",
+			compareOptions: []CompareOption{
+				IgnoreResourceAttributeValue("node_id"),
+			},
+			withoutOptions: expectation{
+				err: multierr.Combine(
+					errors.New("missing expected resource with attributes: map[node_id:BB902-expected]"),
+					errors.New("missing expected resource with attributes: map[node_id:BB904-expected]"),
+					errors.New("missing expected resource with attributes: map[node_id:BB903-expected]"),
+					errors.New("missing expected resource with attributes: map[namespace:test node_id:BB902-expected]"),
+					errors.New("missing expected resource with attributes: map[namespace:test node_id:BB904-expected]"),
+					errors.New("missing expected resource with attributes: map[namespace:test node_id:BB903-expected]"),
+					errors.New("extra resource with attributes: map[node_id:BB902-actual]"),
+					errors.New("extra resource with attributes: map[node_id:BB904-actual]"),
+					errors.New("extra resource with attributes: map[node_id:BB903-actual]"),
+					errors.New("extra resource with attributes: map[namespace:test node_id:BB902-actual]"),
+					errors.New("extra resource with attributes: map[namespace:test node_id:BB904-actual]"),
+					errors.New("extra resource with attributes: map[namespace:test node_id:BB903-actual]"),
+				),
+				reason: "An unpredictable resource attribute will cause failures if not ignored.",
+			},
+			withOptions: expectation{
+				err:    nil,
+				reason: "The unpredictable resource attribute was ignored on each resource that carried it, but the predictable attributes were preserved.",
+			},
+		},
+		{
+			name: "sort-unordered-resource-metrics",
+			compareOptions: []CompareOption{
+				IgnoreResourceAttributeValue("node_id"),
+			},
+			withoutOptions: expectation{
+				err: multierr.Combine(
+					errors.New("missing expected resource with attributes: map[namespace:test node_id:hasfewermetrics]"),
+					errors.New("missing expected resource with attributes: map[namespace:test node_id:hasmoremetrics]"),
+					errors.New("extra resource with attributes: map[namespace:test node_id:hasfewermetrics-actual]"),
+					errors.New("extra resource with attributes: map[namespace:test node_id:hasmoremetrics-actual]"),
+				),
+				reason: "An unpredictable resource attribute will cause failures if not ignored.",
+			},
+			withOptions: expectation{
+				err:    nil,
+				reason: "The underbred resource metrics was properly sorted. The unpredictable resource attribute was ignored on each resource that carried it, but the predictable attributes were preserved.",
+			},
+		},
+		{
+			name: "sort-unordered-metric-slice",
+			withoutOptions: expectation{
+				err:    nil,
+				reason: "the underbred metric slices was properly sorted.",
+			},
+		},
+		{
 			name: "ignore-each-attribute-value",
 			compareOptions: []CompareOption{
 				IgnoreMetricAttributeValue("hostname", "gauge.one", "sum.one"),
