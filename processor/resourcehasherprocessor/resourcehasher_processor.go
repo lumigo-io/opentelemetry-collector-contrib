@@ -155,7 +155,15 @@ func (rhp *resourceHasherProcessor) hashAndCacheResourceAttributes(m pcommon.Map
 
 		resendFullResource = rhp.config.MaximumCacheEntryAge.Seconds() < elapsedTime.Seconds()
 
-		rhp.logger.Debug("resendFullResource", zap.Bool("resendFullResource", resendFullResource), zap.Time("now", now), zap.Time("previous", previous.(time.Time)), zap.Duration("elapsedTime", elapsedTime), zap.Duration("MaximumCacheEntryAge", rhp.config.MaximumCacheEntryAge))
+		if entry := rhp.logger.Check(zapcore.DebugLevel, "resendFullResource"); entry != nil {
+			entry.Write(
+				zap.Bool("resendFullResource", resendFullResource),
+				zap.Time("now", now),
+				zap.Time("previous", previous.(time.Time)),
+				zap.Duration("elapsedTime", elapsedTime),
+				zap.Duration("MaximumCacheEntryAge", rhp.config.MaximumCacheEntryAge),
+			)
+		}
 	}
 
 	if resendFullResource {
