@@ -77,6 +77,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/routingprocessor v0.60.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanmetricsprocessor v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanprocessor v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.60.0
