@@ -797,7 +797,7 @@ replace github.com/open-telemetry/opentelemetry-collector-contrib/processor/metr
 
 replace github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor => ./processor/probabilisticsamplerprocessor/
 
-replace github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionpbykeyrocessor => ./processor/redactionpbykeyrocessor/
+replace github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor => ./processor/redactionbykeyprocessor/
 
 replace github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor => ./processor/resourcedetectionprocessor/
 
