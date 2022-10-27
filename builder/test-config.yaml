@@ -16,7 +16,7 @@ exporters:
     sampling_thereafter: 1
 
 processors:
-  redaction/remove_secrets:
+  redactionbykey:
     allow_all_keys: true
     blocked_values:
       - "[^=]+[a-zA-Z]*pass[a-zA-Z]*=[^=]"
@@ -44,5 +44,5 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [resource/lumigo_token_from_auth,transform/normalize_spans,redaction/remove_secrets]
+      processors: [resource/lumigo_token_from_auth,transform/normalize_spans,redactionbykey]
       exporters: [logging]
