@@ -35,10 +35,19 @@ type Config struct {
 	// allowed span attributes. Values that match are masked
 	BlockedValues []string `mapstructure:"blocked_values"`
 
+	// BlockedValues is a list of regular expressions for blocking values of
+	// allowed span attributes. Values that match are masked
+	BlockedValuesByKey []BlockedValueByKey `mapstructure:"blocked_values_by_key"`
+
 	// Summary controls the verbosity level of the diagnostic attributes that
 	// the processor adds to the spans when it redacts or masks other
 	// attributes. In some contexts a list of redacted attributes leaks
 	// information, while it is valuable when integrating and testing a new
 	// configuration. Possible values are `debug`, `info`, and `silent`.
 	Summary string `mapstructure:"summary"`
+}
+
+type BlockedValueByKey struct {
+    Key string `mapstructure:"key"`
+    Regex string `mapstructure:"regex"`
 }
