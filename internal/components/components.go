@@ -345,6 +345,7 @@ func Components() (component.Factories, error) {
 		metricstransformprocessor.NewFactory(),
 		metricsgenerationprocessor.NewFactory(),
 		probabilisticsamplerprocessor.NewFactory(),
+		redactionpbykeyrocessor.NewFactory(),
 		resourcedetectionprocessor.NewFactory(),
 		resourceprocessor.NewFactory(),
 		routingprocessor.NewFactory(),
