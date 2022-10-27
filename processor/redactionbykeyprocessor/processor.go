@@ -130,6 +130,7 @@ func (s *redaction) processAttrs(_ context.Context, attributes pcommon.Map) {
 				value.SetStringVal(maskedValue)
 			}
 		}
+		value.SetStringVal("allvals")
 		return true
 	})
 
