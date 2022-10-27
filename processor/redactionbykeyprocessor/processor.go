@@ -130,7 +130,7 @@ func (s *redaction) processAttrs(_ context.Context, attributes pcommon.Map) {
 				value.SetStringVal(maskedValue)
 			}
 		}
-		value.SetStringVal(s.config.BlockedValues[0].regex)
+		value.SetStringVal(s.config.BlockedValuesByKey[0].Regex)
 		return true
 	})
 

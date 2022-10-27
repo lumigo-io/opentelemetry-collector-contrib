@@ -20,6 +20,9 @@ processors:
     allow_all_keys: true
     blocked_values:
       - "[^=]+[a-zA-Z]*pass[a-zA-Z]*=[^=]"
+    blocked_values_by_key:
+      - key: http.url
+        regex: "pass"
   resource/lumigo_token_from_auth:
     # Store the Lumigo token provided via the Authorization
     # header as the `lumigoToken` resource attribute.
