@@ -108,6 +108,8 @@ func (s *redaction) processAttrs(_ context.Context, attributes pcommon.Map) {
 	// - Only range through all attributes once
 	// - Don't mask any values if the whole attribute is slated for deletion
 	attributes.Range(func(k string, value pcommon.Value) bool {
+
+	    fmt.Print("In attributes loop")
 		// Make a list of attribute keys to redact
 		if !s.config.AllowAllKeys {
 			if _, allowed := s.allowList[k]; !allowed {
