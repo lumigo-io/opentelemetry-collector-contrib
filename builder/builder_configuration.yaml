@@ -15,12 +15,12 @@ processors:
   - import: go.opentelemetry.io/collector/processor/batchprocessor
     gomod: go.opentelemetry.io/collector v0.60.0
   - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.60.0"
-  - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcehasherprocessor v0.60.0"
+  - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor v0.60.0"
   - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.60.0"
   - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.60.0"
 
 replaces:
   # a list of "replaces" directives that will be part of the resulting go.mod
   - github.com/open-telemetry/opentelemetry-collector-contrib/extension/lumigoauthextension v0.60.0 => github.com/lumigo-io/opentelemetry-collector-contrib/extension/lumigoauthextension 585478a75f3c3c7fe280e98b7aa43b1ad0dcf344
-#  - github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor v0.60.0 => github.com/lumigo-io/opentelemetry-collector-contrib/processor/redactionbykeyprocessor 2d1506fcb161fdc4183c36307af2bb545eccdd5a
-  - github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcehasherprocessor v0.60.0 => github.com/lumigo-io/opentelemetry-collector-contrib/processor/resourcehasherprocessor 1306ffa7a6f605571f7f265f2e71e8b0957588da
+  - github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor v0.60.0 => github.com/lumigo-io/opentelemetry-collector-contrib/processor/redactionbykeyprocessor dd996410b36e7655e6e0d3abaa465f5b61ae6305
+#  - github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcehasherprocessor v0.60.0 => github.com/lumigo-io/opentelemetry-collector-contrib/processor/resourcehasherprocessor 1306ffa7a6f605571f7f265f2e71e8b0957588da
