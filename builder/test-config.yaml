@@ -12,6 +12,8 @@ extensions:
 exporters:
   logging:
     loglevel: debug
+    sampling_initial: 1
+    sampling_thereafter: 1
 
 processors:
   redaction/remove_secrets:
@@ -43,8 +45,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [resource/lumigo_token_from_auth,transform/normalize_spans,redaction/remove_secrets,batch]
-      exporters:
-       - logging
-  telemetry:
-    logs:
-      level: "debug"
+      exporters: [logging]
