@@ -64,7 +64,7 @@ func newRedaction(ctx context.Context, config *Config, logger *zap.Logger, next 
 	return &redaction{
 		allowList:              allowList,
 		blockRegexList:         blockRegexList,
-		blockRegexByKeyList:    blockRegexByKeyList
+		blockRegexByKeyList:    blockRegexByKeyList,
 		config:                 config,
 		logger:                 logger,
 		next:                   next,
