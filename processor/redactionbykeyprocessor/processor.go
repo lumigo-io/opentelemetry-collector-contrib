@@ -253,7 +253,7 @@ func makeBlockRegexByKeyList(_ context.Context, config *Config) (map[string]*reg
 		if err != nil {
 			return nil, fmt.Errorf("error compiling regex in block list: %w", err)
 		}
-		blockRegexList[toBlock.key] = re
+		blockRegexList[toBlock.Key] = re
 	}
 	return blockRegexList, nil
 }
