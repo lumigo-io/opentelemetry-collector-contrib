@@ -140,13 +140,13 @@ func (s *redaction) processAttrs(_ context.Context, attributes pcommon.Map) {
 
 		// Mask any blocked values for the specified keys
         fmt.Println("Checking attributes to mask: ", k, s.blockRegexByKeyList[k])
-		if s.blockRegexByKeyList[k] {
+		if re, ok := s.blockRegexByKeyList[k]; ok {
             strVal := value.StringVal()
-            match := s.blockRegexByKeyList[k].MatchString(strVal)
+            match := re.MatchString(strVal)
             if match {
                 toBlock = append(toBlock, k)
 
-                maskedValue := s.blockRegexByKeyList[k].ReplaceAllString(strVal, "****")
+                maskedValue := re.ReplaceAllString(strVal, "****")
                 value.SetStringVal(maskedValue)
             }
 		}
