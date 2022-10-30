@@ -37,6 +37,8 @@ type redaction struct {
 	allowList map[string]string
 	// Attribute values blocked in a span
 	blockRegexList map[string]*regexp.Regexp
+	// Attribute values blocked in a span by key
+	blockRegexByKeyList map[string]*regexp.Regexp
 	// Redaction processor configuration
 	config *Config
 	// Logger
@@ -53,13 +55,19 @@ func newRedaction(ctx context.Context, config *Config, logger *zap.Logger, next 
 		// TODO: Placeholder for an error metric in the next PR
 		return nil, fmt.Errorf("failed to process block list: %w", err)
 	}
+	blockRegexByKeyList, err := makeBlockRegexByKeyList(ctx, config)
+	if err != nil {
+		// TODO: Placeholder for an error metric in the next PR
+		return nil, fmt.Errorf("failed to process block list: %w", err)
+	}
 
 	return &redaction{
-		allowList:      allowList,
-		blockRegexList: blockRegexList,
-		config:         config,
-		logger:         logger,
-		next:           next,
+		allowList:              allowList,
+		blockRegexList:         blockRegexList,
+		blockRegexByKeyList:    blockRegexByKeyList
+		config:                 config,
+		logger:                 logger,
+		next:                   next,
 	}, nil
 }
 
@@ -109,7 +117,6 @@ func (s *redaction) processAttrs(_ context.Context, attributes pcommon.Map) {
 	// - Don't mask any values if the whole attribute is slated for deletion
 	attributes.Range(func(k string, value pcommon.Value) bool {
 
-	    fmt.Print("In attributes loop")
 		// Make a list of attribute keys to redact
 		if !s.config.AllowAllKeys {
 			if _, allowed := s.allowList[k]; !allowed {
@@ -130,7 +137,19 @@ func (s *redaction) processAttrs(_ context.Context, attributes pcommon.Map) {
 				value.SetStringVal(maskedValue)
 			}
 		}
-		value.SetStringVal(s.config.BlockedValuesByKey[0].Regex)
+
+		// Mask any blocked values for the specified keys
+        fmt.Println("Checking attributes to mask: ", k, s.blockRegexByKeyList[k])
+		if s.blockRegexByKeyList[k] {
+            strVal := value.StringVal()
+            match := s.blockRegexByKeyList[k].MatchString(strVal)
+            if match {
+                toBlock = append(toBlock, k)
+
+                maskedValue := s.blockRegexByKeyList[k].ReplaceAllString(strVal, "****")
+                value.SetStringVal(maskedValue)
+            }
+		}
 		return true
 	})
 
@@ -222,6 +241,19 @@ func makeBlockRegexList(_ context.Context, config *Config) (map[string]*regexp.R
 			return nil, fmt.Errorf("error compiling regex in block list: %w", err)
 		}
 		blockRegexList[pattern] = re
+	}
+	return blockRegexList, nil
+}
+
+// makeBlockRegexByKeyList precompiles all the blocked regex patterns
+func makeBlockRegexByKeyList(_ context.Context, config *Config) (map[string]*regexp.Regexp, error) {
+	blockRegexList := make(map[string]*regexp.Regexp, len(config.BlockedValuesByKey))
+	for _, toBlock := range config.BlockedValuesByKey {
+		re, err := regexp.Compile(toBlock.Regex)
+		if err != nil {
+			return nil, fmt.Errorf("error compiling regex in block list: %w", err)
+		}
+		blockRegexList[toBlock.key] = re
 	}
 	return blockRegexList, nil
 }

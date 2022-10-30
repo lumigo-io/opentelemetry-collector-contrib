@@ -22,5 +22,5 @@ processors:
 replaces:
   # a list of "replaces" directives that will be part of the resulting go.mod
   - github.com/open-telemetry/opentelemetry-collector-contrib/extension/lumigoauthextension v0.60.0 => github.com/lumigo-io/opentelemetry-collector-contrib/extension/lumigoauthextension 585478a75f3c3c7fe280e98b7aa43b1ad0dcf344
-  - github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor v0.60.0 => github.com/lumigo-io/opentelemetry-collector-contrib/processor/redactionbykeyprocessor 33920101b6171c64e44d77a97e682cf1f6fe8256
+  - github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor v0.60.0 => github.com/lumigo-io/opentelemetry-collector-contrib/processor/redactionbykeyprocessor 629308b5178e0a69e881a68e8c234a9b3ac9aa70
 #  - github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcehasherprocessor v0.60.0 => github.com/lumigo-io/opentelemetry-collector-contrib/processor/resourcehasherprocessor 1306ffa7a6f605571f7f265f2e71e8b0957588da
