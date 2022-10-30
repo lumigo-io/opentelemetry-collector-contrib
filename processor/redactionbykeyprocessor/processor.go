@@ -62,12 +62,12 @@ func newRedaction(ctx context.Context, config *Config, logger *zap.Logger, next 
 	}
 
 	return &redaction{
-		allowList:              allowList,
-		blockRegexList:         blockRegexList,
-		blockRegexByKeyList:    blockRegexByKeyList,
-		config:                 config,
-		logger:                 logger,
-		next:                   next,
+		allowList:           allowList,
+		blockRegexList:      blockRegexList,
+		blockRegexByKeyList: blockRegexByKeyList,
+		config:              config,
+		logger:              logger,
+		next:                next,
 	}, nil
 }
 
@@ -139,16 +139,15 @@ func (s *redaction) processAttrs(_ context.Context, attributes pcommon.Map) {
 		}
 
 		// Mask any blocked values for the specified keys
-        fmt.Println("Checking attributes to mask: ", k, s.blockRegexByKeyList[k])
 		if re, ok := s.blockRegexByKeyList[k]; ok {
-            strVal := value.StringVal()
-            match := re.MatchString(strVal)
-            if match {
-                toBlock = append(toBlock, k)
+			strVal := value.StringVal()
+			match := re.MatchString(strVal)
+			if match {
+				toBlock = append(toBlock, k)
 
-                maskedValue := re.ReplaceAllString(strVal, "****")
-                value.SetStringVal(maskedValue)
-            }
+				maskedValue := re.ReplaceAllString(strVal, "****")
+				value.SetStringVal(maskedValue)
+			}
 		}
 		return true
 	})

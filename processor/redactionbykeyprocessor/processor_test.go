@@ -351,6 +351,46 @@ func TestMultipleBlockValues(t *testing.T) {
 	assert.Equal(t, "mystery ****", mysteryValue.StringVal())
 }
 
+// TestBlockValuesByKey validates that the processor can block by key
+func TestBlockValuesByKey(t *testing.T) {
+	config := &Config{
+		AllowAllKeys:       true,
+		BlockedValuesByKey: []BlockedValueByKey{{Key: "http.host", Regex: ".*:.*(@)"}},
+		Summary:            "debug"}
+	allowed := map[string]pcommon.Value{}
+	masked := map[string]pcommon.Value{
+		"http.host": pcommon.NewValueString("user:pass@domain.com/path"),
+	}
+	redacted := map[string]pcommon.Value{}
+
+	_, _, next := runTest(t, allowed, redacted, masked, config)
+
+	firstOutILS := next.AllTraces()[0].ResourceSpans().At(0).ScopeSpans().At(0)
+	attr := firstOutILS.Spans().At(0).Attributes()
+	var deleted []string
+	for k := range redacted {
+		_, ok := attr.Get(k)
+		assert.False(t, ok)
+		deleted = append(deleted, k)
+	}
+	_, ok := attr.Get(redactedKeys)
+	assert.False(t, ok)
+	_, ok = attr.Get(redactedKeyCount)
+	assert.False(t, ok)
+
+	blockedKeys := []string{"http.host"}
+	maskedValues, ok := attr.Get(maskedValues)
+	assert.True(t, ok)
+	sort.Strings(blockedKeys)
+	assert.Equal(t, strings.Join(blockedKeys, ","), maskedValues.StringVal())
+	maskedValues.Equal(pcommon.NewValueString(strings.Join(blockedKeys, ",")))
+	maskedValueCount, ok := attr.Get(maskedValueCount)
+	assert.True(t, ok)
+	assert.Equal(t, int64(len(blockedKeys)), maskedValueCount.IntVal())
+	httpHostValue, _ := attr.Get("http.host")
+	assert.Equal(t, "****domain.com/path", httpHostValue.StringVal())
+}
+
 // TestProcessAttrsAppliedTwice validates a use case when data is coming through redaction processor more than once.
 // Existing attributes must be updated, not overridden or ignored.
 func TestProcessAttrsAppliedTwice(t *testing.T) {
