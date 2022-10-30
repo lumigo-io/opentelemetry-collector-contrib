@@ -1,4 +1,4 @@
-redaction:
+redactionbykey:
   # Flag to allow all span attribute keys. Setting this to true disables the
   # allowed_keys list. The list of blocked_values is applied regardless. If
   # you just want to block values, set this to true.
@@ -17,6 +17,11 @@ redaction:
   blocked_values:
     - "4[0-9]{12}(?:[0-9]{3})?" ## Visa credit card number
     - "(5[1-5][0-9]{14})"       ## MasterCard number
+  # BlockedValuesByKey is a list of regular expressions for blocking values of
+  # specified keys in span attributes.
+  blocked_values_by_key:
+    - key: http.host
+      regex: "localhost"
   # Summary controls the verbosity level of the diagnostic attributes that
   # the processor adds to the spans when it redacts or masks other
   # attributes. In some contexts a list of redacted attributes leaks

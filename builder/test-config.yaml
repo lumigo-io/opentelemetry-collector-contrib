@@ -22,7 +22,7 @@ processors:
       - "[^=]+[a-zA-Z]*pass[a-zA-Z]*=[^=]"
     blocked_values_by_key:
       - key: http.host
-        regex: "nomatch"
+        regex: "localhost"
   resource/lumigo_token_from_auth:
     # Store the Lumigo token provided via the Authorization
     # header as the `lumigoToken` resource attribute.
