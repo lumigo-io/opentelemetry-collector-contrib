@@ -11,6 +11,5 @@ ADD . /repo
 
 RUN /go/bin/builder --config=/repo/builder/builder_configuration.yaml --output-path=/repo/dist
 
-EXPOSE 4318
 
 CMD [ "/repo/dist/otelcol-custom", "--config", "/repo/builder/test-config.yaml"]

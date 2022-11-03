@@ -1,4 +1,4 @@
-# Redaction processor
+# Redaction By Key processor
 
 | Status                   |            |
 | ------------------------ |------------|
@@ -45,7 +45,7 @@ Examples:
 
 ```yaml
 processors:
-  redaction:
+  redactionbykey:
     # allow_all_keys is a flag which when set to true, which can disables the
     # allowed_keys list. The list of blocked_values is applied regardless. If
     # you just want to block values, set this to true.
@@ -65,6 +65,9 @@ processors:
     blocked_values:
       - "4[0-9]{12}(?:[0-9]{3})?" ## Visa credit card number
       - "(5[1-5][0-9]{14})"       ## MasterCard number
+    blocked_values_by_key:
+      - key: http.url
+        regex: ".*:.*(@)"
     # summary controls the verbosity level of the diagnostic attributes that
     # the processor adds to the spans when it redacts or masks other
     # attributes. In some contexts a list of redacted attributes leaks

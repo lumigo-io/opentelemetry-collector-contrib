@@ -355,11 +355,11 @@ func TestMultipleBlockValues(t *testing.T) {
 func TestBlockValuesByKey(t *testing.T) {
 	config := &Config{
 		AllowAllKeys:       true,
-		BlockedValuesByKey: []BlockedValueByKey{{Key: "http.host", Regex: ".*:.*(@)"}},
+		BlockedValuesByKey: []BlockedValueByKey{{Key: "http.host", Regex: "^.*:.*(@)"}},
 		Summary:            "debug"}
 	allowed := map[string]pcommon.Value{}
 	masked := map[string]pcommon.Value{
-		"http.host": pcommon.NewValueString("user:pass@domain.com/path"),
+		"http.host": pcommon.NewValueString("user:pass@domain.com"),
 	}
 	redacted := map[string]pcommon.Value{}
 
@@ -388,7 +388,7 @@ func TestBlockValuesByKey(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, int64(len(blockedKeys)), maskedValueCount.IntVal())
 	httpHostValue, _ := attr.Get("http.host")
-	assert.Equal(t, "****domain.com/path", httpHostValue.StringVal())
+	assert.Equal(t, "****domain.com", httpHostValue.StringVal())
 }
 
 // TestProcessAttrsAppliedTwice validates a use case when data is coming through redaction processor more than once.
