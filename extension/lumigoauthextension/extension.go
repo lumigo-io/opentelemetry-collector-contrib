@@ -38,6 +38,12 @@ func newServerAuthExtension(cfg *Config, logger *zap.Logger) (configauth.ServerA
 	la := lumigoAuth{
 		logger: logger,
 	}
+
+	// Just to make golint not bother us :-)
+	if cfg != nil {
+		cfg = nil
+	}
+
 	return configauth.NewServerAuthenticator(
 		configauth.WithStart(la.serverStart),
 		configauth.WithAuthenticate(la.authenticate),
