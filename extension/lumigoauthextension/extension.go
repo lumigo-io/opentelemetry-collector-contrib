@@ -17,6 +17,7 @@ package lumigoauthextension // import "github.com/open-telemetry/opentelemetry-c
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"go.opentelemetry.io/collector/client"
@@ -36,6 +37,10 @@ type lumigoAuth struct {
 }
 
 func newServerAuthExtension(cfg *Config, logger *zap.Logger) (configauth.ServerAuthenticator, error) {
+	if logger == nil {
+		return nil, fmt.Errorf("the provided logger is nil")
+	}
+
 	la := lumigoAuth{
 		logger: logger,
 		cfg:    cfg,
