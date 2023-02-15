@@ -32,16 +32,13 @@ var (
 
 type lumigoAuth struct {
 	logger *zap.Logger
+	cfg    *Config
 }
 
 func newServerAuthExtension(cfg *Config, logger *zap.Logger) (configauth.ServerAuthenticator, error) {
 	la := lumigoAuth{
 		logger: logger,
-	}
-
-	// Just to make golint not bother us :-)
-	if cfg != nil {
-		cfg = nil
+		cfg:    cfg,
 	}
 
 	return configauth.NewServerAuthenticator(
