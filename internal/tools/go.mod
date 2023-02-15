@@ -47,7 +47,7 @@ require (
 	github.com/charithe/durationcheck v0.0.9 // indirect
 	github.com/chavacava/garif v0.0.0-20220630083739-93517212f375 // indirect
 	github.com/curioswitch/go-reassign v0.1.2 // indirect
-	github.com/daixiang0/gci v0.6.3 // indirect
+	github.com/daixiang0/gci v0.9.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/denis-tingaikin/go-header v0.4.3 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
