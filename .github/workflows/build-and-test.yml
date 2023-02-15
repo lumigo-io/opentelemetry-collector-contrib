@@ -535,6 +535,8 @@ jobs:
     - lint
     - unittest
     - integration-tests
+    # We depend on cross-compile instead of build-package to make sure we get all the binaries we need
+    - cross-compile
     # - build-package # skip, not used for the Lumigo builds
     # We build this for PRs (their reference looks likme `refs/pull/<pr_id>/head` )
     if: startsWith(github.ref, 'refs/pull/') && github.repository == 'lumigo-io/opentelemetry-collector-contrib'
