@@ -573,9 +573,16 @@ jobs:
       - name: Set Pre-Release Tag
         id: github_tag
         run: ./.github/workflows/scripts/set_prerelease_tag.sh
+      - name: Set PR Identifier
+        id: github_pr_id
+        run: ./.github/workflows/scripts/set_pr_id.sh
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ steps.github_tag.outputs.tag }}
+          message: "PR ${{ steps.github_pr_id.outputs.id }} draft-release"
       - name: Create Github Release
         run: |
-          ghr -n "${RELEASE_TAG}" -prerelease -t $GITHUB_TOKEN -u $GITHUB_REPOSITORY_OWNER -r opentelemetry-collector-contrib -replace $RELEASE_TAG bin/
+          ghr -n "${RELEASE_TAG}" -prerelease -t "${GITHUB_TOKEN}" -u "${GITHUB_REPOSITORY_OWNER}" -r opentelemetry-collector-contrib -replace "${RELEASE_TAG}" bin/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ steps.github_tag.outputs.tag }}
