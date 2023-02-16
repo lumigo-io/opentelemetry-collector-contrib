@@ -548,6 +548,17 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.19
+      - name: Cache Go
+        id: go-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/bin
+            ~/go/pkg/mod
+          key: go-cache-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+      - name: Install Tools
+        if: steps.go-cache.outputs.cache-hit != 'true'
+        run: make install-tools
       - name: Mkdir bin and dist
         run: |
           mkdir bin/ dist/
@@ -587,6 +598,17 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.19
+      - name: Cache Go
+        id: go-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/bin
+            ~/go/pkg/mod
+          key: go-cache-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+      - name: Install Tools
+        if: steps.go-cache.outputs.cache-hit != 'true'
+        run: make install-tools
       - name: Mkdir bin and dist
         run: |
           mkdir bin/ dist/
