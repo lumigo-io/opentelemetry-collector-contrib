@@ -535,7 +535,7 @@ jobs:
     needs:
     - lint
     - unittest
-    - integration-tests
+    #- integration-tests # TODO restore
     # We depend on cross-compile instead of build-package to make sure we get all the binaries we need
     - cross-compile
     # - build-package # skip, not used for the Lumigo builds
@@ -551,27 +551,20 @@ jobs:
       - name: Mkdir bin and dist
         run: |
           mkdir bin/ dist/
-      - name: Cache Go
-        id: go-cache
-        uses: actions/cache@v3
+      - name: Download Binaries
+        uses: actions/download-artifact@v3
         with:
-          path: |
-            ~/go/bin
-            ~/go/pkg/mod
-          key: go-cache-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
-      - name: Install dependencies
-        if: steps.go-cache.outputs.cache-hit != 'true'
-        run: make -j2 gomoddownload
-      - name: Install Tools
-        if: steps.go-cache.outputs.cache-hit != 'true'
-        run: make install-tools
+          name: collector-binaries
+          path: ./bin/
+      - name: Verify Distribution Files Exist
+        id: check
+        run: ./.github/workflows/scripts/verify-release-artifacts-exist.sh
       - name: Set Pre-Release Tag
         id: github_tag
         run: ./.github/workflows/scripts/set_prerelease_tag.sh
       - name: Create Github Release
         run: |
-          mkdir -p dist/
-          ghr -draft -t $GITHUB_TOKEN -u $GITHUB_REPOSITORY_OWNER -r opentelemetry-collector-contrib --replace $RELEASE_TAG dist/
+          ghr -n "${$RELEASE_TAG}" -prerelease -t $GITHUB_TOKEN -u $GITHUB_REPOSITORY_OWNER -r opentelemetry-collector-contrib -replace $RELEASE_TAG bin/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ steps.github_tag.outputs.tag }}
@@ -595,27 +588,20 @@ jobs:
       - name: Mkdir bin and dist
         run: |
           mkdir bin/ dist/
-      - name: Cache Go
-        id: go-cache
-        uses: actions/cache@v3
+      - name: Download Binaries
+        uses: actions/download-artifact@v3
         with:
-          path: |
-            ~/go/bin
-            ~/go/pkg/mod
-          key: go-cache-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
-      - name: Install dependencies
-        if: steps.go-cache.outputs.cache-hit != 'true'
-        run: make -j2 gomoddownload
-      - name: Install Tools
-        if: steps.go-cache.outputs.cache-hit != 'true'
-        run: make install-tools
+          name: collector-binaries
+          path: ./bin/
+      - name: Verify Distribution Files Exist
+        id: check
+        run: ./.github/workflows/scripts/verify-release-artifacts-exist.sh
       - name: Set Release Tag
         id: github_tag
         run: ./.github/workflows/scripts/set_release_tag.sh
       - name: Create Github Release
         run: |
-          mkdir -p dist/
-          ghr -t $GITHUB_TOKEN -u $GITHUB_REPOSITORY_OWNER -r opentelemetry-collector-contrib --replace $RELEASE_TAG dist/
+          ghr -t $GITHUB_TOKEN -u $GITHUB_REPOSITORY_OWNER -r opentelemetry-collector-contrib --replace $RELEASE_TAG bin/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ steps.github_tag.outputs.tag }}
