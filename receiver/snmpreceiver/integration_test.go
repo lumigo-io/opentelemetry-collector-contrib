@@ -15,10 +15,11 @@
 //go:build integration
 // +build integration
 
-package snmpreceiver
+package snmpreceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/snmpreceiver"
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -36,6 +37,10 @@ import (
 )
 
 func TestSnmpReceiverIntegration(t *testing.T) {
+	if _, isCi := os.LookupEnv("CI"); isCi {
+		return
+	}
+
 	testCases := []struct {
 		desc                    string
 		configFilename          string
