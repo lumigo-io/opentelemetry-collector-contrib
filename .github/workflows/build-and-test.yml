@@ -467,7 +467,7 @@ jobs:
           echo "Builder config:"
           cat ./cmd/otelcontribcol/builder-config.yaml
 
-          make go_os=${{ matrix.os }} go_arch=${{ matrix.arch }} otelcontribcolbuilder
+          make GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} otelcontribcolbuilder
       - name: Upload Collector Binaries
         uses: actions/upload-artifact@v3
         with:
