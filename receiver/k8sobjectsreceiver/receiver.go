@@ -156,7 +156,7 @@ func (kr *k8sobjectsreceiver) startPull(ctx context.Context, config *K8sObjectsC
 					// Fence modifications in a nested block for ease of rebasing
 					for _, item := range objects.Items {
 						object := item
-						moreLogs, err1 := kr.ensureReferencesAreKnown(ctx, resource, &object)
+						moreLogs, err1 := kr.ensureReferencesAreKnown(ctx, &object)
 						if err1 != nil {
 							kr.setting.Logger.Error("Cannot retrieve resource versions and owner references", zap.Any("object", toObjectReference(&object)), zap.Error(err))
 						} else if moreLogs != nil && moreLogs.LogRecordCount() > 0 {
@@ -206,7 +206,7 @@ func (kr *k8sobjectsreceiver) startWatch(ctx context.Context, config *K8sObjects
 			{
 				// Fence modifications in a nested block for ease of rebasing
 				object := (data.Object).(*unstructured.Unstructured)
-				moreLogs, err := kr.ensureReferencesAreKnown(ctx, resource, object)
+				moreLogs, err := kr.ensureReferencesAreKnown(ctx, object)
 				if err != nil {
 					kr.setting.Logger.Error("Cannot retrieve resource versions and owner references", zap.Any("object", toObjectReference(object)), zap.Error(err))
 				} else if moreLogs != nil && moreLogs.LogRecordCount() > 0 {
@@ -241,7 +241,7 @@ func NewTicker(repeat time.Duration) *time.Ticker {
 	return ticker
 }
 
-func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, resource dynamic.ResourceInterface, unstructured *unstructured.Unstructured) (*plog.Logs, error) {
+func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, unstructured *unstructured.Unstructured) (*plog.Logs, error) {
 	gvk := unstructured.GroupVersionKind()
 
 	switch gvk {
@@ -252,9 +252,11 @@ func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, reso
 				return nil, fmt.Errorf("cannot parse v1.Pod from unstructured: %w", err)
 			}
 
-			kr.addCacheEntry(pod.APIVersion, pod.Kind, string(pod.ObjectMeta.UID), pod.ObjectMeta.ResourceVersion)
+			defer func() {
+				kr.addCacheEntry(pod.APIVersion, pod.Kind, string(pod.ObjectMeta.UID), pod.ObjectMeta.ResourceVersion)
+			}()
 
-			return kr.ensureOwnerReferencesAreKnown(ctx, resource, &pod.ObjectMeta.OwnerReferences)
+			return kr.ensureOwnerReferencesAreKnown(ctx, pod.GetNamespace(), &pod.ObjectMeta.OwnerReferences)
 		}
 	case eventv1:
 		{
@@ -264,7 +266,7 @@ func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, reso
 				return nil, fmt.Errorf("cannot parse v1.Event from unstructured: %w", err)
 			}
 			// We do not need to create cache keys for the event itself
-			return kr.ensureObjectReferenceIsKnown(ctx, resource, &event.InvolvedObject)
+			return kr.ensureObjectReferenceIsKnown(ctx, &event.InvolvedObject)
 		}
 	case daemonsetv1:
 		{
@@ -273,9 +275,11 @@ func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, reso
 				return nil, fmt.Errorf("cannot parse appsv1.DaemonSet from unstructured: %w", err)
 			}
 
-			kr.addCacheEntry(daemonSet.APIVersion, daemonSet.Kind, string(daemonSet.ObjectMeta.UID), daemonSet.ObjectMeta.ResourceVersion)
+			defer func() {
+				kr.addCacheEntry(daemonSet.APIVersion, daemonSet.Kind, string(daemonSet.ObjectMeta.UID), daemonSet.ObjectMeta.ResourceVersion)
+			}()
 
-			return kr.ensureOwnerReferencesAreKnown(ctx, resource, &daemonSet.ObjectMeta.OwnerReferences)
+			return kr.ensureOwnerReferencesAreKnown(ctx, daemonSet.GetNamespace(), &daemonSet.ObjectMeta.OwnerReferences)
 		}
 	case deploymentv1:
 		{
@@ -284,9 +288,11 @@ func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, reso
 				return nil, fmt.Errorf("cannot parse appsv1.Deployment from unstructured: %w", err)
 			}
 
-			kr.addCacheEntry(deployment.APIVersion, deployment.Kind, string(deployment.ObjectMeta.UID), deployment.ObjectMeta.ResourceVersion)
+			defer func() {
+				kr.addCacheEntry(deployment.APIVersion, deployment.Kind, string(deployment.ObjectMeta.UID), deployment.ObjectMeta.ResourceVersion)
+			}()
 
-			return kr.ensureOwnerReferencesAreKnown(ctx, resource, &deployment.ObjectMeta.OwnerReferences)
+			return kr.ensureOwnerReferencesAreKnown(ctx, deployment.GetNamespace(), &deployment.ObjectMeta.OwnerReferences)
 		}
 	case replicasetv1:
 		{
@@ -295,9 +301,11 @@ func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, reso
 				return nil, fmt.Errorf("cannot parse appsv1.ReplicaSet from unstructured: %w", err)
 			}
 
-			kr.addCacheEntry(replicaSet.APIVersion, replicaSet.Kind, string(replicaSet.ObjectMeta.UID), replicaSet.ObjectMeta.ResourceVersion)
+			defer func() {
+				kr.addCacheEntry(replicaSet.APIVersion, replicaSet.Kind, string(replicaSet.ObjectMeta.UID), replicaSet.ObjectMeta.ResourceVersion)
+			}()
 
-			return kr.ensureOwnerReferencesAreKnown(ctx, resource, &replicaSet.ObjectMeta.OwnerReferences)
+			return kr.ensureOwnerReferencesAreKnown(ctx, replicaSet.GetNamespace(), &replicaSet.ObjectMeta.OwnerReferences)
 		}
 	case statefulsetv1:
 		{
@@ -306,9 +314,11 @@ func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, reso
 				return nil, fmt.Errorf("cannot parse appsv1.StatefulSet from unstructured: %w", err)
 			}
 
-			kr.addCacheEntry(statefulSet.APIVersion, statefulSet.Kind, string(statefulSet.ObjectMeta.UID), statefulSet.ObjectMeta.ResourceVersion)
+			defer func() {
+				kr.addCacheEntry(statefulSet.APIVersion, statefulSet.Kind, string(statefulSet.ObjectMeta.UID), statefulSet.ObjectMeta.ResourceVersion)
+			}()
 
-			return kr.ensureOwnerReferencesAreKnown(ctx, resource, &statefulSet.ObjectMeta.OwnerReferences)
+			return kr.ensureOwnerReferencesAreKnown(ctx, statefulSet.GetNamespace(), &statefulSet.ObjectMeta.OwnerReferences)
 		}
 	case cronjobv1:
 		{
@@ -317,9 +327,11 @@ func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, reso
 				return nil, fmt.Errorf("cannot parse batchv1.CronJob from unstructured: %w", err)
 			}
 
-			kr.addCacheEntry(cronJob.APIVersion, cronJob.Kind, string(cronJob.ObjectMeta.UID), cronJob.ObjectMeta.ResourceVersion)
+			defer func() {
+				kr.addCacheEntry(cronJob.APIVersion, cronJob.Kind, string(cronJob.ObjectMeta.UID), cronJob.ObjectMeta.ResourceVersion)
+			}()
 
-			return kr.ensureOwnerReferencesAreKnown(ctx, resource, &cronJob.ObjectMeta.OwnerReferences)
+			return kr.ensureOwnerReferencesAreKnown(ctx, cronJob.GetNamespace(), &cronJob.ObjectMeta.OwnerReferences)
 		}
 	case jobv1:
 		{
@@ -328,26 +340,29 @@ func (kr *k8sobjectsreceiver) ensureReferencesAreKnown(ctx context.Context, reso
 				return nil, fmt.Errorf("cannot parse batchv1.Job from unstructured: %w", err)
 			}
 
-			kr.addCacheEntry(job.APIVersion, job.Kind, string(job.ObjectMeta.UID), job.ObjectMeta.ResourceVersion)
+			defer func() {
+				kr.addCacheEntry(job.APIVersion, job.Kind, string(job.ObjectMeta.UID), job.ObjectMeta.ResourceVersion)
+			}()
 
-			return kr.ensureOwnerReferencesAreKnown(ctx, resource, &job.ObjectMeta.OwnerReferences)
+			return kr.ensureOwnerReferencesAreKnown(ctx, job.GetNamespace(), &job.ObjectMeta.OwnerReferences)
 		}
 	default:
 		return nil, fmt.Errorf("unexpected GroupVersionKind: %+v", gvk)
 	}
 }
 
-func (kr *k8sobjectsreceiver) ensureOwnerReferencesAreKnown(ctx context.Context, resource dynamic.ResourceInterface, ownerReferences *[]metav1.OwnerReference) (*plog.Logs, error) {
+func (kr *k8sobjectsreceiver) ensureOwnerReferencesAreKnown(ctx context.Context, namespace string, ownerReferences *[]metav1.OwnerReference) (*plog.Logs, error) {
 	res := plog.NewLogs()
 	for _, ownerReference := range *ownerReferences {
 		objectReference := corev1.ObjectReference{
 			Kind:       ownerReference.Kind,
+			Namespace:  namespace,
 			Name:       ownerReference.Name,
 			APIVersion: ownerReference.APIVersion,
 			UID:        ownerReference.UID,
 		}
 
-		logs, err := kr.ensureObjectReferenceIsKnown(ctx, resource, &objectReference)
+		logs, err := kr.ensureObjectReferenceIsKnown(ctx, &objectReference)
 		if err != nil {
 			return nil, fmt.Errorf("cannot retrieve owner reference '%v': %w", objectReference, err)
 		}
@@ -360,18 +375,17 @@ func (kr *k8sobjectsreceiver) ensureOwnerReferencesAreKnown(ctx context.Context,
 	return &res, nil
 }
 
-func (kr *k8sobjectsreceiver) ensureObjectReferenceIsKnown(ctx context.Context, resource dynamic.ResourceInterface, objectRef *corev1.ObjectReference) (*plog.Logs, error) {
+func (kr *k8sobjectsreceiver) ensureObjectReferenceIsKnown(ctx context.Context, objectRef *corev1.ObjectReference) (*plog.Logs, error) {
 	if kr.hasCacheEntry(objectRef.APIVersion, objectRef.Kind, string(objectRef.UID), objectRef.ResourceVersion) {
 		return nil, nil
 	}
-
-	kr.setting.Logger.Debug("Retrieving object reference", zap.Any("objectReference", objectRef))
 
 	listOptions := metav1.ListOptions{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: objectRef.APIVersion,
 			Kind:       objectRef.Kind,
 		},
+		FieldSelector: fmt.Sprintf("metadata.namespace=%s,metadata.name=%s", objectRef.Namespace, objectRef.Name),
 	}
 
 	// We might not have a resource version, if this object reference is created from an owner reference
@@ -380,9 +394,21 @@ func (kr *k8sobjectsreceiver) ensureObjectReferenceIsKnown(ctx context.Context, 
 		listOptions.ResourceVersionMatch = metav1.ResourceVersionMatchExact
 	}
 
+	resource, err := kr.getResource(objectRef)
+	if err != nil {
+		return nil, fmt.Errorf("cannot instantiate resource for object reference: %v", objectRef)
+	}
+
 	res, err := resource.List(ctx, listOptions)
 	if err != nil {
+		kr.setting.Logger.Debug("Cannot retrieve object reference", zap.Any("objectReference", objectRef), zap.Any("listOptions", listOptions), zap.Error(err))
 		return nil, fmt.Errorf("cannot list %s/%s for resource version '%s': %w", objectRef.APIVersion, objectRef.Kind, objectRef.ResourceVersion, err)
+	}
+
+	kr.setting.Logger.Debug("Retrieved object reference", zap.Any("objectReference", objectRef), zap.Any("listOptions", listOptions), zap.Any("result", res))
+
+	if len(res.Items) < 1 {
+		return nil, fmt.Errorf("cannot find %s/%s.%s in namespace %s, resourceVersion %s", objectRef.APIVersion, objectRef.Kind, objectRef.Name, objectRef.Namespace, objectRef.ResourceVersion)
 	}
 
 	cfg := K8sObjectsConfig{
@@ -423,6 +449,34 @@ func (kr *k8sobjectsreceiver) addCacheEntry(apiVersion, kind, uid, resourceVersi
 			kr.setting.Logger.Debug("Added cache key", zap.Any("cacheKey", objectCacheKey))
 		}
 	}
+}
+
+func (kr *k8sobjectsreceiver) getResource(objectRef *corev1.ObjectReference) (dynamic.NamespaceableResourceInterface, error) {
+	objectRefGVK := schema.FromAPIVersionAndKind(objectRef.APIVersion, objectRef.Kind)
+
+	resourceName := ""
+	switch objectRefGVK {
+	case podv1:
+		resourceName = "pods"
+	case eventv1:
+		resourceName = "events"
+	case daemonsetv1:
+		resourceName = "daemonsets"
+	case deploymentv1:
+		resourceName = "deployments"
+	case replicasetv1:
+		resourceName = "replicasets"
+	case statefulsetv1:
+		resourceName = "statefulsets"
+	case cronjobv1:
+		resourceName = "cronjobs"
+	case jobv1:
+		resourceName = "jobs"
+	default:
+		return nil, fmt.Errorf("unexpected GroupVersionKind: %+v", objectRefGVK)
+	}
+
+	return kr.client.Resource(objectRefGVK.GroupVersion().WithResource(resourceName)), nil
 }
 
 func toCacheKey(apiVersion, kind, uid, resourceVersion string) string {
