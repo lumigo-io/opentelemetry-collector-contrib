@@ -27,11 +27,13 @@ processors:
   - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.71.0"
   - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.71.0"
   - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.71.0"
+  - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8seventsenricherprocessor v0.71.0"
   - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.71.0"
   - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor v0.71.0"
   - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.71.0"
 
 replaces:
   - github.com/open-telemetry/opentelemetry-collector-contrib/extension/lumigoauthextension v0.71.0 => ../extension/lumigoauthextension
+  - github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8seventsenricherprocessor v0.71.0 => ../processor/k8seventsenricherprocessor
   - github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor v0.71.0 => ../processor/redactionbykeyprocessor
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sobjectsreceiver v0.71.0 => ../receiver/k8sobjectsreceiver

@@ -19,6 +19,7 @@ require (
 require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/signalfxexporter v0.71.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/lumigoauthextension v0.71.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8seventsenricherprocessor v0.71.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor v0.71.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/signalfxreceiver v0.71.0 // indirect
 	github.com/signalfx/signalfx-agent/pkg/apm v0.0.0-20220920175102-539ae8d8ba8e // indirect
@@ -1047,5 +1048,7 @@ retract v0.65.0
 replace github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sshcheckreceiver => ../../receiver/sshcheckreceiver
 
 replace github.com/open-telemetry/opentelemetry-collector-contrib/extension/lumigoauthextension => ../../extension/lumigoauthextension
+
+replace github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8seventsenricherprocessor => ../../processor/k8seventsenricherprocessor
 
 replace github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionbykeyprocessor => ../../processor/redactionbykeyprocessor
