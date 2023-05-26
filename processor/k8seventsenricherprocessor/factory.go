@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package k8seventsenricherprocessor
+package k8seventsenricherprocessor // import "github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8seventsenricherprocessor"
 
 import (
 	"context"
