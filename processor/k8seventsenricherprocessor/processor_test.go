@@ -83,7 +83,7 @@ func TestEnrichDeploymentPodEvent(t *testing.T) {
 	body := logRecord.Body()
 	destMap := body.SetEmptyMap()
 
-	destMap.FromRaw(map[string]interface{}{
+	err = destMap.FromRaw(map[string]interface{}{
 		"apiVersion": "v1",
 		"kind":       "Event",
 		"metadata": map[string]interface{}{
@@ -95,12 +95,13 @@ func TestEnrichDeploymentPodEvent(t *testing.T) {
 			"kind":            event.InvolvedObject.Kind,
 			"namespace":       event.InvolvedObject.Namespace,
 			"name":            event.InvolvedObject.Name,
-			"uid":             event.InvolvedObject.UID,
+			"uid":             string(event.InvolvedObject.UID),
 			"resourceVersion": event.InvolvedObject.ResourceVersion,
 		},
 	})
+	require.NoError(t, err)
 
-	r.processResourceLogs(context.TODO(), &resourceLogs)
+	logs, err = r.processLogs(context.TODO(), logs)
 
 	require.NoError(t, err)
 	require.NotNil(t, r)
