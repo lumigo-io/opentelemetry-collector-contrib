@@ -67,6 +67,7 @@ func TestEnrichDeploymentPodEvent(t *testing.T) {
 		processortest.NewNopCreateSettings(),
 		rCfg,
 	)
+	require.NoError(t, err)
 
 	event := generateEvent("ImagePullBackoff", "Warning", corev1.ObjectReference{
 		APIVersion: pod.APIVersion,
