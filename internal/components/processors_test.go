@@ -84,6 +84,10 @@ func TestDefaultProcessors(t *testing.T) {
 			skipLifecycle: true, // Requires a k8s API to communicate with
 		},
 		{
+			processor:     "k8seventsenricherprocessor",
+			skipLifecycle: true, // need a valid Kubernetes host and port
+		},
+		{
 			processor: "memory_limiter",
 			getConfigFn: func() component.Config {
 				cfg := procFactories["memory_limiter"].CreateDefaultConfig().(*memorylimiterprocessor.Config)
