@@ -15,8 +15,9 @@
 package k8seventsenricherprocessor // import "github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8seventsenricherprocessor"
 
 import (
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig"
 	"k8s.io/client-go/dynamic"
+
+	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig"
 )
 
 type Config struct {
